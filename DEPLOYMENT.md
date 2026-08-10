@@ -86,11 +86,24 @@ POST /chat không gửi Authorization header
 HTTP 401
 WWW-Authenticate: Bearer
 {"detail":"invalid or missing bearer token"}
+
+POST /chat có token đúng
+HTTP 200
+{"reply":"Ngắn gọn: Deploy la gi phụ thuộc vào ba yếu tố — cấu hình qua biến môi trường, health check để orchestrator biết trạng thái, và giới hạn tài nguyên.","client_id":"sv-test","turns_before":0,"usd_cost":2.265e-05,"usage":{"prompt":3,"completion":37}}
+
+POST /chat gọi liên tiếp 15 lần (rate limit)
+200 200 200 200 200 200 200 200 200 429 429 429 429 200 429
 ```
+
+9 request đầu tiên qua được (bucket_capacity=10, tính cả token dùng cho lần
+test #4 trước đó nên xô còn 9). Sau đó bị 429 liên tục — nhưng có 1 request
+"200" lọt vào giữa dãy 429 (vị trí thứ 14): vì mỗi request tốn thời gian
+round-trip qua mạng thật tới Railway, đủ để xô kịp nạp lại đúng 1 token
+(refill_per_minute=10 → ~0.167 token/giây) trước khi request đó tới. Đây là
+bằng chứng token bucket đang hoạt động đúng thời gian thực, không phải hiện
+tượng ngẫu nhiên.
 
 ## Ảnh Chụp Màn Hình
 
-Đặt ảnh trong thư mục `screenshots/`:
-
-- `screenshots/dashboard.png` — trang quản lý service trên platform
-- `screenshots/healthz.png` — kết quả gọi `/healthz` từ trình duyệt hoặc curl
+- `screenshots/dashboard.jpg` — trang quản lý service trên Railway (2 service: `day12-chat`, `day12-chat-redis`, đều Online)
+- `screenshots/healthz.jpg` — kết quả gọi `/healthz` từ trình duyệt trên URL production
