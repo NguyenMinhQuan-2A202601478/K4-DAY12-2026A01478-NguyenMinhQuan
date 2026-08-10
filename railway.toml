@@ -10,6 +10,9 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+# Dockerfile already starts Uvicorn through `sh -c`, which expands the
+# Railway-provided PORT variable.  Do not override that CMD here: Railway
+# runs Docker start-command overrides in exec form, where `$PORT` is literal.
 healthcheckPath = "/healthz"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
