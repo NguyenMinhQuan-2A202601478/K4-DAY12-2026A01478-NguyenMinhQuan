@@ -52,8 +52,16 @@ jobs:
 
       - name: Deploy
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service chat --detach
+          # Workspace token (RAILWAY_API_TOKEN), not a single-project token —
+          # nên phải truyền rõ --project/--service/--environment, không có
+          # thư mục "linked" sẵn để CLI tự suy ra.
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+        run: >
+          railway up
+          --project 775c708f-98e2-4976-93dc-0667687d714b
+          --service day12-chat
+          --environment production
+          --ci -y
 
       - name: Smoke test
         run: |
