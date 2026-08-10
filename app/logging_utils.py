@@ -20,7 +20,7 @@ def utc_now_iso() -> str:
 def emit(event: str, severity: str = "INFO", **fields) -> str:
     """Ghi một dòng log JSON ra stdout.
 
-    TODO (CP1): tạo dict gồm tối thiểu 3 khóa
+    (CP1): tạo dict gồm tối thiểu 3 khóa
         - "event"    : tên sự kiện, lấy từ tham số ``event``
         - "severity" : mức log, VIẾT HOA (dùng ``severity.upper()``) — đây là
                        tên khóa mà Google Cloud Logging hiểu để tô màu và lọc
@@ -35,4 +35,14 @@ def emit(event: str, severity: str = "INFO", **fields) -> str:
         >>> emit("chat_completed", client_id="sv01", usd_cost=0.0001)
         '{"event": "chat_completed", "severity": "INFO", "ts": "...", ...}'
     """
-    raise NotImplementedError("TODO (CP1): cài đặt emit")
+    # raise NotImplementedError("TODO (CP1): cài đặt emit")
+    data = {
+    "event": event,
+    "severity": severity.upper(),
+    "ts": utc_now_iso(),
+    }
+    data.update(fields)
+
+    line = json.dumps(data, ensure_ascii=False)
+    print(line, file=sys.stdout)
+    return line
